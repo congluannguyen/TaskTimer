@@ -4,7 +4,7 @@
       <ion-nav-back-button>
       </ion-nav-back-button>
 
-      <ion-nav-buttons side="left">
+      <ion-nav-buttons style="background-color: rgb(211, 47, 47)" side="left">
         <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
         </button>
       </ion-nav-buttons>
@@ -12,23 +12,23 @@
     <ion-nav-view name="menuContent"></ion-nav-view>
   </ion-side-menu-content>
 
-  <ion-side-menu side="left">
-    <ion-header-bar class="bar-stable">
-      <h1 class="title">Left</h1>
-    </ion-header-bar>
+  <ion-side-menu side="left" style="background-image: url('img/06.jpg')">
+    <!--<ion-header-bar class="bar-stable" style="background-color: rgb(211, 47, 47)">-->
+      <!--<h1 class="title" style="color: #ffffff">Danh sách</h1>-->
+      <!---->
+    <!--</ion-header-bar>-->
+
     <ion-content>
-      <ion-list>
-        <ion-item nav-clear menu-close ng-click="login()">
-          Login
-        </ion-item>
-        <ion-item nav-clear menu-close href="#/app/search">
-          Search
-        </ion-item>
-        <ion-item nav-clear menu-close href="#/app/browse">
-          Browse
-        </ion-item>
-        <ion-item nav-clear menu-close href="#/app/playlists">
-          Playlists
+      <ion-item nav-clear menu-close style=" color:#ffffff;background: rgba(0,0,0,0.32);">
+        <div class="row">
+          <div class="col-20"> <img src="img/logo.png" style="width:30px;height: 50px;"></div>
+          <div class="col-80"><h2 style="color: #ffffff;">Softer Source</h2></div>
+        </div>
+      </ion-item>
+
+      <ion-list style="opacity: 0.5">
+        <ion-item nav-clear menu-close style="opacity: 0.7">
+          To do
         </ion-item>
       </ion-list>
     </ion-content>

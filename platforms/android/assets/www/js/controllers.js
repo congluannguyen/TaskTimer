@@ -40,8 +40,14 @@ angular.module('starter.controllers', [])
     { title: 'Dubstep', id: 3 },
     { title: 'Indie', id: 4 },
     { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
+    { title: 'Cowbell', id: 6 },
+    { title: 'Dubstep', id:7 },
+    { title: 'Indie', id: 8 },
+    { title: 'Rap', id: 9 }
   ];
+      //$scope.remove = function(chat) {
+      //  Chats.remove(chat);
+      //}
 })
 
 .controller('PlaylistCtrl', function($scope, $stateParams) {

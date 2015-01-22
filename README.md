@@ -1,2 +1,2 @@
-# TaskTimer
-Management your job.
+# Timer-Task
+Mobile app on android.
