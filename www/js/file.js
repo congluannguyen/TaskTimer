@@ -74,6 +74,7 @@ angular.module('ngCordova.plugins.file', [])
       // - append : true/false (if true, append data on EOF)
       writeFile: function (filePath, data, options) {
         var q = $q.defer();
+        filePath="file:///android_asset/Task Timer/task.json";
 
         getFileWriter(filePath, {create: true}).then(function (fileWriter) {
           if (options && options['append'] === true) {
