@@ -133,26 +133,42 @@ angular.module('ngCordova.plugins.appRate', [])
 
   .provider("$cordovaAppRate", [function () {
 
+    this.setAppUrl = function (device, url) {
+      var devices = ['ios', 'android', 'blackberry', 'windows8'];
 
-    this.setPreferences = function (defaults) {
-      if (!defaults || !angular.isObject(defaults)) {
-        return;
+      if (devices.indexOf(device) !== -1) {
+        AppRate.preferences.storeAppURL[device] = url;
       }
-
-      AppRate.preferences.useLanguage = defaults.language || null;
-      AppRate.preferences.displayAppName = defaults.appName || "";
-      AppRate.preferences.promptAgainForEachNewVersion = defaults.promptForNewVersion || true;
-      AppRate.preferences.openStoreInApp = defaults.openStoreInApp || false;
-      AppRate.preferences.usesUntilPrompt = defaults.usesUntilPrompt || 3;
-      AppRate.preferences.useCustomRateDialog = defaults.useCustomRateDialog || false;
-      AppRate.preferences.storeAppURL.ios = defaults.iosURL || null;
-      AppRate.preferences.storeAppURL.android = defaults.androidURL || null;
-      AppRate.preferences.storeAppURL.blackberry = defaults.blackberryURL || null;
-      AppRate.preferences.storeAppURL.windows8 = defaults.windowsURL || null;
+      else {
+        alert("wrong device type");
+      }
     };
 
+    this.useLanguage = function (language) {
+      AppRate.preferences.useLanguage = language;
+    };
 
-    this.setCustomLocale = function (customObj) {
+    this.displayAppName = function (name) {
+      AppRate.preferences.displayAppName = name;
+    };
+
+    this.promptAgainForEachNewVersion = function (boolean) {
+      AppRate.preferences.promptAgainForEachNewVersion = boolean;
+    };
+
+    this.usesUntilPrompt = function (number) {
+      AppRate.preferences.usesUntilPrompt = number;
+    };
+
+    this.openStoreInApp = function (boolean) {
+      AppRate.preferences.openStoreInApp = boolean;
+    };
+
+    this.useCustomRateDialog = function (boolean) {
+      AppRate.preferences.useCustomRateDialog = boolean;
+    };
+
+    this.customLocale = function (customObj) {
       var strings = {
         title: 'Rate %@',
         message: 'If you enjoy using %@, would you mind taking a moment to rate it? It won’t take more than a minute. Thanks for your support!',
@@ -418,8 +434,8 @@ angular.module('ngCordova.plugins.batteryStatus', [])
     }, false);
     return true;
   }])
-  .run(['$cordovaBatteryStatus', function ($cordovaBatteryStatus) {
-  }]);
+  .run(function ($cordovaBatteryStatus) {
+  });
 
 //  install   :   cordova plugin add https://github.com/don/cordova-plugin-ble-central#:/plugin
 //  link      :   https://github.com/don/cordova-plugin-ble-central
@@ -2104,7 +2120,7 @@ angular.module('ngCordova.plugins.fileTransfer', [])
       download: function (source, filePath, options, trustAllHosts) {
         var q = $q.defer();
         var ft = new FileTransfer();
-        var uri = (options && options.encodeURI === false) ? source : encodeURI(source);
+        var uri = options.encodeURI === false ? source : encodeURI(source);
 
         if (options && options.timeout !== undefined && options.timeout !== null) {
           $timeout(function () {
@@ -2124,7 +2140,7 @@ angular.module('ngCordova.plugins.fileTransfer', [])
       upload: function (server, filePath, options, trustAllHosts) {
         var q = $q.defer();
         var ft = new FileTransfer();
-        var uri = (options && options.encodeURI === false) ? server : encodeURI(server);
+        var uri = options.encodeURI === false ? server : encodeURI(server);
 
         if (options && options.timeout !== undefined && options.timeout !== null) {
           $timeout(function () {
@@ -2860,213 +2876,6 @@ angular.module('ngCordova.plugins.googleMap', [])
       cleanup: function () {
         map = null;
         // delete map;
-      }
-    };
-  }]);
-
-// install   :      cordova plugin add https://github.com/Telerik-Verified-Plugins/HealthKit
-// link      :      https://github.com/Telerik-Verified-Plugins/HealthKit
-
-angular.module('ngCordova.plugins.healthKit', [])
-
-  .factory('$cordovaHealthKit', ['$q', '$window', function ($q, $window) {
-
-    return {
-      isAvailable: function () {
-        var q = $q.defer();
-
-        $window.plugins.healthkit.available(function (success) {
-          q.resolve(success);
-        }, function (err) {
-          q.reject(err);
-        });
-
-        return q.promise;
-      },
-
-      /**
-       * Request authorization to access HealthKit data. See the full HealthKit constants
-       * reference for possible read and write types:
-       * https://developer.apple.com/library/ios/documentation/HealthKit/Reference/HealthKit_Constants/
-       */
-      requestAuthorization: function (readTypes, writeTypes) {
-        var q = $q.defer();
-
-        readTypes = readTypes || [
-          'HKCharacteristicTypeIdentifierDateOfBirth', 'HKQuantityTypeIdentifierActiveEnergyBurned', 'HKQuantityTypeIdentifierHeight'
-        ];
-        writeTypes = writeTypes || [
-          'HKQuantityTypeIdentifierActiveEnergyBurned', 'HKQuantityTypeIdentifierHeight', 'HKQuantityTypeIdentifierDistanceCycling'
-        ];
-
-        $window.plugins.healthkit.requestAuthorization({
-          'readTypes': readTypes,
-          'writeTypes': writeTypes
-        }, function (success) {
-          q.resolve(success);
-        }, function (err) {
-          q.reject(err);
-        });
-
-        return q.promise;
-      },
-
-      readDateOfBirth: function () {
-        var q = $q.defer();
-        $window.plugins.healthkit.readDateOfBirth(
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-
-        return q.promise;
-      },
-
-      readGender: function () {
-        var q = $q.defer();
-        $window.plugins.healthkit.readGender(
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-
-        return q.promise;
-      },
-
-      saveWeight: function (value, units, date) {
-        var q = $q.defer();
-        $window.plugins.healthkit.saveWeight({
-            'unit': units || 'lb',
-            'amount': value,
-            'date': date || new Date()
-          },
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-        return q.promise;
-      },
-
-      readWeight: function (units) {
-        var q = $q.defer();
-        $window.plugins.healthkit.readWeight({
-            'unit': units || 'lb'
-          },
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-
-        return q.promise;
-      },
-      saveHeight: function (value, units, date) {
-        var q = $q.defer();
-        $window.plugins.healthkit.saveHeight({
-            'unit': units || 'in',
-            'amount': value,
-            'date': date || new Date()
-          },
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-        return q.promise;
-      },
-      readHeight: function (units) {
-        var q = $q.defer();
-        $window.plugins.healthkit.readHeight({
-            'unit': units || 'in'
-          },
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-
-        return q.promise;
-      },
-
-      findWorkouts: function () {
-        var q = $q.defer();
-        $window.plugins.healthkit.findWorkouts({},
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-        return q.promise;
-      },
-
-      /**
-       * Save a workout.
-       *
-       * Workout param should be of the format:
-       {
-         'activityType': 'HKWorkoutActivityTypeCycling', // HKWorkoutActivityType constant (https://developer.apple.com/library/ios/documentation/HealthKit/Reference/HKWorkout_Class/#//apple_ref/c/tdef/HKWorkoutActivityType)
-         'quantityType': 'HKQuantityTypeIdentifierDistanceCycling',
-         'startDate': new Date(), // mandatory
-         'endDate': null, // optional, use either this or duration
-         'duration': 3600, // in seconds, optional, use either this or endDate
-         'energy': 300, //
-         'energyUnit': 'kcal', // J|cal|kcal
-         'distance': 11, // optional
-         'distanceUnit': 'km' // probably useful with the former param
-         // 'extraData': "", // Not sure how necessary this is
-       },
-       */
-      saveWorkout: function (workout) {
-        var q = $q.defer();
-        $window.plugins.healthkit.saveWorkout(workout,
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-        return q.promise;
-      },
-
-      /**
-       * Sample any kind of health data through a given date range.
-       * sampleQuery of the format:
-       {
-									'startDate': yesterday, // mandatory
-									'endDate': tomorrow, // mandatory
-									'sampleType': 'HKQuantityTypeIdentifierHeight',
-									'unit' : 'cm'
-							},
-       */
-      querySampleType: function (sampleQuery) {
-        var q = $q.defer();
-        $window.plugins.healthkit.querySampleType(sampleQuery,
-          function (success) {
-            q.resolve(success);
-          },
-          function (err) {
-            q.resolve(err);
-          }
-        );
-        return q.promise;
       }
     };
   }]);
@@ -3883,7 +3692,6 @@ angular.module('ngCordova.plugins', [
   'ngCordova.plugins.googleAds',
   'ngCordova.plugins.googleAnalytics',
   'ngCordova.plugins.googleMap',
-  'ngCordova.plugins.healthKit',
   'ngCordova.plugins.httpd',
   'ngCordova.plugins.iAd',
   'ngCordova.plugins.imagePicker',
@@ -4162,8 +3970,8 @@ angular.module('ngCordova.plugins.network', [])
       }
     };
   }])
-  .run(['$cordovaNetwork', function ($cordovaNetwork) {
-  }]);
+  .run(function ($cordovaNetwork) {
+  });
 
 /* Created by Nic Raboy
  * http://www.nraboy.com
@@ -5332,7 +5140,7 @@ angular.module('ngCordova.plugins.push', [])
         var q = $q.defer();
         var injector;
         if (config !== undefined && config.ecb === undefined) {
-          if (document.querySelector('[ng-app]') == null) {
+          if (angular.element(document.querySelector('[ng-app]')) === undefined) {
             injector = "document.body";
           }
           else {
@@ -5408,9 +5216,6 @@ angular.module('ngCordova.plugins.socialSharing', [])
     return {
       share: function (message, subject, file, link) {
         var q = $q.defer();
-        subject = subject || null;
-        file = file || null;
-        link = link || null;
         $window.plugins.socialsharing.share(message, subject, file, link, function () {
           q.resolve(true);
         }, function () {
@@ -5421,8 +5226,6 @@ angular.module('ngCordova.plugins.socialSharing', [])
 
       shareViaTwitter: function (message, file, link) {
         var q = $q.defer();
-        file = file || null;
-        link = link || null;
         $window.plugins.socialsharing.shareViaTwitter(message, file, link, function () {
           q.resolve(true);
         }, function () {
@@ -5433,8 +5236,6 @@ angular.module('ngCordova.plugins.socialSharing', [])
 
       shareViaWhatsApp: function (message, file, link) {
         var q = $q.defer();
-        file = file || null;
-        link = link || null;
         $window.plugins.socialsharing.shareViaWhatsApp(message, file, link, function () {
           q.resolve(true);
         }, function () {
@@ -5445,9 +5246,6 @@ angular.module('ngCordova.plugins.socialSharing', [])
 
       shareViaFacebook: function (message, file, link) {
         var q = $q.defer();
-        message = message || null;
-        file = file || null;
-        link = link || null;
         $window.plugins.socialsharing.shareViaFacebook(message, file, link, function () {
           q.resolve(true);
         }, function () {
@@ -5456,11 +5254,9 @@ angular.module('ngCordova.plugins.socialSharing', [])
         return q.promise;
       },
 
-      shareViaFacebookWithPasteMessageHint: function (message, file, link, pasteMessageHint) {
+      shareViaFacebookWithPasteMessageHint: function (message, file, url, pasteMessageHint) {
         var q = $q.defer();
-        file = file || null;
-        link = link || null;
-        $window.plugins.socialsharing.shareViaFacebookWithPasteMessageHint(message, file, link, pasteMessageHint, function () {
+        $window.plugins.socialsharing.shareViaFacebookWithPasteMessageHint(message, file, url, pasteMessageHint, function () {
           q.resolve(true);
         }, function () {
           q.reject(false);
@@ -5480,10 +5276,6 @@ angular.module('ngCordova.plugins.socialSharing', [])
 
       shareViaEmail: function (message, subject, toArr, ccArr, bccArr, fileArr) {
         var q = $q.defer();
-        toArr = toArr || null;
-        ccArr = ccArr || null;
-        bccArr = bccArr || null;
-        fileArr = fileArr || null;
         $window.plugins.socialsharing.shareViaEmail(message, subject, toArr, ccArr, bccArr, fileArr, function () {
           q.resolve(true);
         }, function () {
@@ -5494,10 +5286,6 @@ angular.module('ngCordova.plugins.socialSharing', [])
 
       shareVia: function (via, message, subject, file, link) {
         var q = $q.defer();
-        message = message || null;
-        subject = subject || null;
-        file = file || null;
-        link = link || null;
         $window.plugins.socialsharing.shareVia(via, message, subject, file, link, function () {
           q.resolve(true);
         }, function () {
@@ -5524,18 +5312,6 @@ angular.module('ngCordova.plugins.socialSharing', [])
           q.reject(error);
         });
         return q.promise;
-      },
-
-      available: function () {
-        var q = $q.defer();
-        window.plugins.socialsharing.available(function (isAvailable) {
-          if (isAvailable) {
-            q.resolve();
-          }
-          else {
-            q.reject();
-          }
-        });
       }
     };
   }]);
